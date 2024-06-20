@@ -13,12 +13,7 @@ const authMiddleware = async (req, res, next) => {
     if (!decoded) {
       throw new UnauthorizedError("Please login to continue");
     }
-    const user = await prisma.user.findFirst({
-      where: {
-        email: decoded.email,
-      },
-    });
-    req.user = user;
+    req.user = decoded;
     next();
   } catch (error) {
     next(error);

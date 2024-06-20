@@ -40,6 +40,7 @@ class AuthController {
       const jwtPayload = {
         id: user.id,
         email: user.email,
+        name: user.email,
       };
 
       const token = jwt.sign(jwtPayload, process.env.JWT_SECRET, {

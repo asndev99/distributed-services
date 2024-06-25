@@ -1,12 +1,44 @@
+const { default: axios } = require("axios");
 const prisma = require("../config/db.config");
+const { post } = require("../routes");
 
 class PostController {
   static async index(req, res, next) {
     try {
       const posts = await prisma.post.findMany();
+      const userIds = posts.map((post) => post.user_id);
+
+      // METHOD 1: LESS OPTIMIZED
+      // let postWithUsers = await Promise.all(
+      //   posts.map(async (post) => {
+      //     const res = await axios.get(
+      //       `${process.env.AUTH_MICRO_URL}/api/user/${post.user_id}`
+      //     );
+      //     return {
+      //       ...post,
+      //       user: { ...res.data.payload },
+      //     };
+      //   })
+      // );
+
+      let {
+        data: { payload },
+      } = await axios.get(
+        `${process.env.AUTH_MICRO_URL}/api/user/all`,
+        userIds
+      );
+
+      let postWithUsers = posts.map((post) => {
+        const user = payload.find((user) => user.id == post.user_id);
+        return {
+          ...post,
+          user,
+        };
+      });
+
       return res.status(200).json({
         success: true,
-        data: posts,
+        data: postWithUsers,
         message: null,
       });
     } catch (error) {

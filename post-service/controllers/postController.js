@@ -28,8 +28,13 @@ class PostController {
         userIds
       );
 
+      let users = {};
+      payload.forEach((item) => {
+        users[item.id] = item;
+      });
+
       let postWithUsers = posts.map((post) => {
-        const user = payload.find((user) => user.id == post.user_id);
+        const user = users[post.user_id];
         return {
           ...post,
           user,
